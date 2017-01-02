@@ -57,6 +57,7 @@ this path is normally not pointing to a real Guix store.
       info(from2," onto ",target2);
       if (target2.length != from2.length)
         error("Paths not equally sized for "~target2); // not supposed to happen
+      assert(indexOf(target2,"/gnu/store")==-1,"/gnu/store is not allowed in the target "~target2);
       foreach (key, value ; store_entry) {
         if (target2 == value)
           error("Key conflict for "~target2~". Try a shorter prefix.");
@@ -66,7 +67,20 @@ this path is normally not pointing to a real Guix store.
     }
     debug_info(store_entry);
     // At this point we have the entries and we have a file in memory
-    writeln(buf.length);
-    // writeln(buf[indexOf(buf,"/gnu/store")..$]);
+    auto pos = indexOf(buf,"/gnu/store");
+    while(pos != -1) {
+        writeln(pos);
+        char[] p = buf[pos..$];
+        immutable b = cast(string)buf[pos..pos+100];
+        // writeln(b);
+        immutable path = split(b,"/")[0..4].join("/");
+        writeln(path);
+        immutable target = store_entry[path];
+        writeln(target);
+        foreach(int i, char c; target) {
+          buf[pos+i] = c;
+        }
+        pos = indexOf(buf,"/gnu/store");
+      }
   }
 }
