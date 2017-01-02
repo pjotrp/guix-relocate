@@ -69,18 +69,17 @@ this path is normally not pointing to a real Guix store.
     // At this point we have the entries and we have a file in memory
     auto pos = indexOf(buf,"/gnu/store");
     while(pos != -1) {
-        writeln(pos);
-        char[] p = buf[pos..$];
-        immutable b = cast(string)buf[pos..pos+100];
-        // writeln(b);
-        immutable path = split(b,"/")[0..4].join("/");
-        writeln(path);
-        immutable target = store_entry[path];
-        writeln(target);
-        foreach(int i, char c; target) {
-          buf[pos+i] = c;
-        }
-        pos = indexOf(buf,"/gnu/store");
+      char[] p = buf[pos..$];
+      immutable b = cast(string)buf[pos..pos+100];
+      immutable path = split(b,"/")[0..4].join("/");
+      debug_info("Found ",pos,": ",path);
+      immutable target = store_entry[path];
+      debug_info("Replace with ",target);
+      foreach(int i, char c; target) {
+        buf[pos+i] = c;
       }
+      pos = indexOf(buf,"/gnu/store");
+    }
+    std.file.write("testit",buf);
   }
 }
