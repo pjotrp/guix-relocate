@@ -6,7 +6,7 @@ import std.stdio, std.getopt, std.file;
 import messages;
 
 void main(string[] args) {
-  string origin,prefix;
+  string origin = "./gnu/store", prefix;
   auto help = getopt(
     args,
     "origin", "origin location where path finger prints are harvested (default ./gnu/store)", &origin,
