@@ -45,12 +45,12 @@ this path is normally not pointing to a real Guix store.
     string[string] store_entry;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
       auto from = baseName(d);
-      if (prefix.length > from.length-3)
-        error("Prefix size too large to patch store path for "~from);
       auto list = split(from,"-");
       assert(list.length >= 3,"Guix path "~from~" does not look complete");
       auto target = prefix ~ list[1] ~ list[2];
       info(from," onto ",target);
+      if (target.length > from.length)
+        error("Prefix size too large to patch store path for "~from);
       foreach (key, value ; store_entry) {
         if (target == value)
           error("Key conflict for "~from);
