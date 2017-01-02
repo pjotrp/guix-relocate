@@ -2,7 +2,7 @@
 //
 // Pjotr Prins (c) 2017
 
-import std.stdio, std.getopt, std.file, std.path;
+import std.stdio, std.getopt, std.file, std.path, std.array;
 import messages;
 
 void main(string[] args) {
@@ -47,7 +47,9 @@ this path is normally not pointing to a real Guix store.
       auto from = baseName(d);
       if (prefix.length > from.length-3)
         error("Prefix size too large to patch store path for "~from);
-      auto target = prefix ~ from[prefix.length..$];
+      auto list = split(from,"-");
+      assert(list.length >= 3,"Guix path "~from~" does not look complete");
+      auto target = prefix ~ list[1] ~ list[2];
       info(from," onto ",target);
       foreach (key, value ; store_entry) {
         if (target == value)
