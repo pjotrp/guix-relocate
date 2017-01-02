@@ -49,7 +49,7 @@ this path is normally not pointing to a real Guix store.
       assert(list.length >= 3,"Guix path "~from~" does not look complete");
       auto target = prefix ~ list[1] ~ list[2];
       info(from," onto ",target);
-      if (target.length > from.length)
+      if (target.length > ("/gnu/store/"~from).length+1)
         error("Prefix size too large to patch store path for "~from);
       foreach (key, value ; store_entry) {
         if (target == value)
