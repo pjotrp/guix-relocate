@@ -1,16 +1,18 @@
 module messages;
 
 import std.stdio;
+import core.vararg;
 
-bool debug_info;
+bool is_debug = false, is_verbose = false;
 
-void set_debug(bool deb)
+void info(T...)(T args)
 {
-  debug_info = deb;
+  if (is_verbose)
+    stderr.writeln(args);
 }
 
-void deb(string[] s)
+void debug_info(T...)(T args)
 {
-    if (debug_info)
-      stderr.writeln(s);
+  if (is_debug)
+    stderr.writeln(args);
 }

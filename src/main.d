@@ -7,14 +7,13 @@ import messages;
 
 void main(string[] args) {
   string origin,prefix;
-  bool debug_info;
   auto help = getopt(
     args,
     "origin", "origin location where path finger prints are harvested (default ./gnu/store)", &origin,
     "prefix", "prefix for destination", &prefix,
-    "d", "debug information", &debug_info,
+    "d", "debug information", &messages.is_debug,
+    "v", "verbose", &messages.is_verbose,
     );
-  set_debug(debug_info);
   if (help.helpWanted) {
     defaultGetoptPrinter("
 guix-relocate by Pjotr Prins (c) 2017
@@ -32,11 +31,12 @@ this path is normally not pointing to a real Guix store.
 ",help.options);
   }
   else {
-    deb(args);
+    info("guix-relocate by Pjotr Prins (C) 2017 pjotr.prins@thebird.nl");
+    debug_info(args);
     if (args.length != 2)
       throw new Exception("Wrong number of arguments");
     auto fn = args[1];
     auto buf = read(fn); // assume the file fits into RAM
-    writeln("File = ",fn,", Size = ",buf.length);
+    debug_info("File = ",fn,", Size = ",buf.length);
   }
 }
