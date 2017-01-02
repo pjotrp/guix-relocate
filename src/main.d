@@ -14,7 +14,7 @@ void main(string[] args) {
     "d", "debug information", &messages.is_debug,
     "v", "verbose", &messages.is_verbose,
     );
-  if (help.helpWanted) {
+  if (help.helpWanted || prefix == null) {
     defaultGetoptPrinter("
 guix-relocate by Pjotr Prins (c) 2017
 
@@ -33,10 +33,9 @@ this path is normally not pointing to a real Guix store.
   else {
     info("guix-relocate by Pjotr Prins (C) 2017 pjotr.prins@thebird.nl");
     debug_info(args);
-    if (args.length != 2)
-      throw new Exception("Wrong number of arguments");
+    if (args.length != 2) error("Wrong number of arguments");
     auto fn = args[1];
     auto buf = read(fn); // assume the file fits into RAM
-    debug_info("File = ",fn,", Size = ",buf.length);
+    debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix);
   }
 }
