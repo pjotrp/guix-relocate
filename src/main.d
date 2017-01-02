@@ -2,7 +2,9 @@
 //
 // Pjotr Prins (c) 2017
 
-import std.stdio, std.getopt, std.file, std.path, std.array;
+import std.stdio, std.getopt, std.file, std.path, std.array, std.range, std.conv, std.string;
+import core.sys.posix.stdlib;
+import std.algorithm.searching;
 import messages;
 
 void main(string[] args) {
@@ -34,29 +36,37 @@ this path is normally not pointing to a real Guix store.
     debug_info(args);
     if (args.length != 2) error("Wrong number of arguments");
     auto fn = args[1];
-    auto buf = read(fn); // assume the file fits into RAM
+    char[] buf = cast(char [])read(fn); // assume the file fits into RAM
     debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix);
     if (prefix[$-1]!=dirSeparator[0]) // make sure prefix ends with a separator
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
-    // ---- harvest Guix hashes
+    // ---- harvest Guix hashes and translate to new prefix
     string[string] store_entry;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
-      auto from = baseName(d);
-      auto list = split(from,"-");
+      immutable from = baseName(d);
+      immutable list = split(from,"-");
       assert(list.length >= 3,"Guix path "~from~" does not look complete");
-      auto target = prefix ~ list[1] ~ list[2];
-      info(from," onto ",target);
-      if (target.length > ("/gnu/store/"~from).length+1)
-        error("Prefix size too large to patch store path for "~from);
+      string name = list[1];
+      string ver = list[2];
+      immutable target = prefix ~ name ~ ver ~ "-" ~list[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
+      immutable from2 = "/gnu/store/"~from;
+      immutable target2 = to!string(target.take(from2.length));
+      info(from2," onto ",target2);
+      if (target2.length != from2.length)
+        error("Paths not equally sized for "~target2); // not supposed to happen
       foreach (key, value ; store_entry) {
-        if (target == value)
-          error("Key conflict for "~from);
+        if (target2 == value)
+          error("Key conflict for "~target2~". Try a shorter prefix.");
       }
-      store_entry[from] = target;
+      assert(!exists(target),"Directory already exists "~target2);
+      store_entry[from2] = target2;
     }
-    writeln(store_entry);
+    debug_info(store_entry);
+    // At this point we have the entries and we have a file in memory
+    writeln(buf.length);
+    // writeln(buf[indexOf(buf,"/gnu/store")..$]);
   }
 }
