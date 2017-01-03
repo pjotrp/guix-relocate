@@ -72,9 +72,9 @@ this path is normally not pointing to a real Guix store.
       char[] p = buf[pos..$];
       immutable b = cast(string)buf[pos..pos+100];
       immutable path = split(b,"/")[0..4].join("/");
-      debug_info("Found ",pos,": ",path);
+      debug_info("Found @",pos,":\t",path);
       immutable target = store_entry[path];
-      debug_info("Replace with ",target);
+      debug_info("Replace with\t",target);
       foreach(int i, char c; target) {
         buf[pos+i] = c;
       }
