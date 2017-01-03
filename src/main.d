@@ -49,9 +49,7 @@ this path is normally not pointing to a real Guix store.
       immutable from = baseName(d);
       immutable list = split(from,"-");
       assert(list.length >= 3,"Guix path "~from~" does not look complete");
-      string name = list[1];
-      string ver = list[2];
-      immutable target = prefix ~ name ~ ver ~ "-" ~list[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
+      immutable target = prefix ~ list[1..$].join("-") ~ "-" ~list[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
       immutable from2 = "/gnu/store/"~from;
       immutable target2 = to!string(target.take(from2.length));
       info(from2," onto ",target2);
