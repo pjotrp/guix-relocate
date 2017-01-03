@@ -20,36 +20,38 @@ void main(string[] args) {
     defaultGetoptPrinter("
 guix-relocate by Pjotr Prins (c) 2017
 
-Relocate a file replacing Guix finger prints using a fast Boyer-Moore
-search algorithm and copy the file in the process.
+Relocate a file replacing Guix finger prints using a fast search
+algorithm and copy the file in the process.
 
 Usage:
 
   guix-relocate [-v] [-d] [--origin path] --prefix path FILE
 
 FILE is the file to be relocated relative to the orgin store path. Note that
-this path is normally not pointing to a real Guix store.
+this path is normally not pointing to a real Guix store, but to an unpacked
+tar ball containing ./gnu/store/path(s).
 ",help.options);
   }
   else {
     info("guix-relocate by Pjotr Prins (C) 2017 pjotr.prins@thebird.nl");
     debug_info(args);
     if (args.length != 2) error("Wrong number of arguments");
-    auto fn = args[1];
+    auto fn = origin ~ "/" ~ args[1];
     char[] buf = cast(char [])read(fn); // assume the file fits into RAM
-    debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix);
     if (prefix[$-1]!=dirSeparator[0]) // make sure prefix ends with a separator
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
+    string outfn = prefix ~ args[1];
+    debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
-    // ---- harvest Guix hashes and translate to new prefix
+    // ---- harvest Guix hashes and translate to new prefix path with hash at end
     string[string] store_entry;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
       immutable from = baseName(d);
-      immutable list = split(from,"-");
-      assert(list.length >= 3,"Guix path "~from~" does not look complete");
-      immutable target = prefix ~ list[1..$].join("-") ~ "-" ~list[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
+      immutable split_path = split(from,"-");
+      assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
+      immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
       immutable from2 = "/gnu/store/"~from;
       immutable target2 = to!string(target.take(from2.length));
       info(from2," onto ",target2);
@@ -76,8 +78,9 @@ this path is normally not pointing to a real Guix store.
       foreach(int i, char c; target) {
         buf[pos+i] = c;
       }
-      pos = indexOf(buf,"/gnu/store");
+      pos = indexOf(buf,"/gnu/store"); // should replace with Boyer Moore
     }
-    std.file.write("testit",buf);
+    // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
+    std.file.write(outfn,buf);
   }
 }
