@@ -13,6 +13,8 @@ string reduce_store_path(string fn, string prefix) {
   auto idx = countUntil(sub_paths,"gnu");
   assert(sub_paths[idx+1] == "store", fn~" is not a /gnu/store path");
   immutable from = sub_paths[idx+2];
+  immutable rest = sub_paths[idx+3..$].join("/");
+  debug_info("Rest is "~rest);
   immutable split_path = split(from,"-");
   assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
   immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
