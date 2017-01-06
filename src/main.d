@@ -95,6 +95,7 @@ tar ball containing ./gnu/store/path(s).
       pos = indexOf(buf,"/gnu/store"); // should replace with Boyer Moore
     }
     // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
+    debug_info("Writing "~outfn);
     std.file.write(outfn,buf);
   }
 }
