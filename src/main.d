@@ -7,6 +7,20 @@ import core.sys.posix.stdlib;
 import std.algorithm.searching;
 import messages;
 
+string reduce_store_path(string fn, string prefix) {
+  immutable from = baseName(fn);
+  immutable split_path = split(from,"-");
+  assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
+  immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
+  immutable from2 = "/gnu/store/"~from;
+  immutable target2 = to!string(target.take(from2.length));
+  info(from2," onto ",target2);
+  if (target2.length != from2.length)
+    error("Paths not equally sized for "~target2); // not supposed to happen
+  assert(indexOf(target2,"/gnu/store")==-1,"/gnu/store is not allowed in the target "~target2);
+  return target2;
+}
+
 void main(string[] args) {
   string origin = "./gnu/store", prefix;
   auto help = getopt(
@@ -45,25 +59,18 @@ tar ball containing ./gnu/store/path(s).
     debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
-    // ---- harvest Guix hashes and translate to new prefix path with hash at end
+    // ---- harvest Guix hashes and translate to new prefix path with
+    // hash at end so /gnu/store/hash-entry points to
+    // $prefix/entry-hash with the exact same size
     string[string] store_entry;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
-      immutable from = baseName(d);
-      immutable split_path = split(from,"-");
-      assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
-      immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
-      immutable from2 = "/gnu/store/"~from;
-      immutable target2 = to!string(target.take(from2.length));
-      info(from2," onto ",target2);
-      if (target2.length != from2.length)
-        error("Paths not equally sized for "~target2); // not supposed to happen
-      assert(indexOf(target2,"/gnu/store")==-1,"/gnu/store is not allowed in the target "~target2);
+      string target = reduce_store_path(d,prefix);
       foreach (key, value ; store_entry) {
-        if (target2 == value)
-          error("Key conflict for "~target2~". Try a shorter prefix.");
+        if (target == value)
+          error("Key conflict for "~target~". Try a shorter prefix.");
       }
-      assert(!exists(target),"Directory already exists "~target2);
-      store_entry[from2] = target2;
+      assert(!exists(target),"Directory already exists "~target);
+      store_entry["/gnu/store/"~baseName(d)] = target;
     }
     debug_info(store_entry);
     // At this point we have the entries and we have a file in memory
