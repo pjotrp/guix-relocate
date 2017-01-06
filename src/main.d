@@ -28,6 +28,7 @@ auto reduce_store_path(string fn, string prefix) {
 }
 
 void main(string[] args) {
+  // scope(failure) { exit(-1); };
   string origin = "./gnu/store", prefix;
   auto help = getopt(
     args,
@@ -83,16 +84,17 @@ tar ball containing ./gnu/store/path(s).
     // At this point we have the entries and we have a file in memory
     auto pos = indexOf(buf,"/gnu/store");
     while(pos != -1) {
-      char[] p = buf[pos..$];
-      immutable b = cast(string)buf[pos..pos+100];
+      // char[] p = buf[pos..$];
+      immutable b = cast(string)buf[pos..$];
       immutable path = split(b,"/")[0..4].join("/");
       debug_info("Found @",pos,":\t",path);
-      immutable target = store_entry[path];
+      immutable target = store_entry.get(path,null);
+      assert(target,"Can not find target for "~path);
       debug_info("Replace with\t",target);
       foreach(int i, char c; target) {
         buf[pos+i] = c;
       }
-      pos = indexOf(buf,"/gnu/store"); // should replace with Boyer Moore
+      pos = indexOf(buf,"/gnu/store"); // may be replaced with Boyer Moore
     }
     // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
     debug_info("Writing "~outfn);
