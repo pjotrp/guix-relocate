@@ -8,7 +8,11 @@ import std.algorithm.searching;
 import messages;
 
 string reduce_store_path(string fn, string prefix) {
-  immutable from = baseName(fn);
+  debug_info("Reduce store path "~fn);
+  auto sub_paths = fn.split("/");
+  auto idx = countUntil(sub_paths,"gnu");
+  assert(sub_paths[idx+1] == "store", fn~" is not a /gnu/store path");
+  immutable from = sub_paths[idx+2];
   immutable split_path = split(from,"-");
   assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
   immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
@@ -55,7 +59,7 @@ tar ball containing ./gnu/store/path(s).
     if (prefix[$-1]!=dirSeparator[0]) // make sure prefix ends with a separator
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
-    string outfn = prefix ~ args[1];
+    string outfn = reduce_store_path(args[1],prefix);
     debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
