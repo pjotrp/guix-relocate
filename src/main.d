@@ -9,14 +9,19 @@ import messages;
 
 auto reduce_store_path(string fn, string prefix) {
   debug_info("Reduce store path "~fn);
-  auto sub_paths = fn.split("/");
-  auto idx = countUntil(sub_paths,"gnu");
+  immutable sub_paths = fn.split("/");
+  auto sub_paths_rev = sub_paths.dup.reverse;
+  immutable idxrev = countUntil(sub_paths_rev,"gnu");
+  assert(idxrev != -1, "This should not happen");
+  immutable idx = sub_paths.length - idxrev - 1;
+  writeln(sub_paths_rev);
+  writeln(idx,sub_paths);
   assert(sub_paths[idx+1] == "store", fn~" is not a /gnu/store path");
   immutable from = sub_paths[idx+2];
   immutable rest = sub_paths[idx+3..$].join("/");
   debug_info("Rest is "~rest);
   immutable split_path = split(from,"-");
-  assert(split_path.length >= 3,"Guix path "~from~" does not look complete");
+  assert(split_path.length >= 2,"Guix path "~from~" does not look complete");
   immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
   immutable from2 = "/gnu/store/"~from;
   immutable target2 = to!string(target.take(from2.length));
@@ -28,7 +33,6 @@ auto reduce_store_path(string fn, string prefix) {
 }
 
 void main(string[] args) {
-  // scope(failure) { exit(-1); };
   string origin = "./gnu/store", prefix;
   auto help = getopt(
     args,
