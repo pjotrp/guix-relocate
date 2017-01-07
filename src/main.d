@@ -88,12 +88,18 @@ tar ball containing ./gnu/store/path(s).
     // At this point we have the entries and we have a file in memory
     auto pos = indexOf(buf,"/gnu/store");
     while(pos != -1) {
-      // char[] p = buf[pos..$];
       immutable b = cast(string)buf[pos..$];
       immutable path = split(b,"/")[0..4].join("/");
-      debug_info("Found @",pos,":\t",path);
-      immutable target = store_entry.get(path,null);
-      assert(target,"Can not find target for "~path);
+      debug_info("Found @",pos,":\t<",path,">");
+      // In some cases the string is too long so we walk for a match
+      string found;
+      foreach(int i, char c; path) {
+        auto p = path[0..$-i];
+        found = store_entry.get(p,null);
+        if (found) break;
+      }
+      immutable target = found;
+      assert(target,"Can not find target for <"~path~">");
       debug_info("Replace with\t",target);
       foreach(int i, char c; target) {
         buf[pos+i] = c;
