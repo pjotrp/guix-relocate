@@ -86,25 +86,33 @@ tar ball containing ./gnu/store/path(s).
     }
     debug_info(store_entry);
     // At this point we have the entries and we have a file in memory
-    auto pos = indexOf(buf,"/gnu/store");
+    immutable buf_sliced = cast(string)buf;
+    auto pos = indexOf(buf_sliced,"/gnu/store");
     while(pos != -1) {
-      immutable b = cast(string)buf[pos..$];
+      immutable b = buf_sliced[pos..$];
       immutable path = split(b,"/")[0..4].join("/");
       debug_info("Found @",pos,":\t<",path,">");
-      // In some cases the string is too long so we walk for a match
-      string found;
-      foreach(int i, char c; path) {
-        auto p = path[0..$-i];
-        found = store_entry.get(p,null);
-        if (found) break;
+      if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
+        buf[pos] = '*';
       }
-      immutable target = found;
-      assert(target,"Can not find target for <"~path~">");
-      debug_info("Replace with\t",target);
-      foreach(int i, char c; target) {
-        buf[pos+i] = c;
+      else {
+        // In some cases the string is too long so we walk for a match
+        string found;
+        foreach(int i, char c; path) {
+          auto p = path[0..$-i];
+          found = store_entry.get(p,null);
+          if (found) break;
+        }
+        immutable target = found;
+        assert(target,"Can not find target for <"~path~">");
+        debug_info("Replace with\t",target);
+        foreach(int i, char c; target) {
+          buf[pos+i] = c;
+        }
       }
       pos = indexOf(buf,"/gnu/store"); // may be replaced with Boyer Moore
+      // auto pos2 = indexOf(b[11..$],"/gnu/store"); // may be replaced with Boyer Moore
+      // pos += pos2+11;
     }
     // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
     debug_info("Writing "~outfn);
