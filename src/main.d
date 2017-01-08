@@ -16,8 +16,6 @@ auto reduce_store_path(string fn, string prefix) {
   immutable idxrev = countUntil(sub_paths_rev,"gnu");
   assert(idxrev != -1, "This should not happen");
   immutable idx = sub_paths.length - idxrev - 1;
-  writeln(sub_paths_rev);
-  writeln(idx,sub_paths);
   assert(sub_paths[idx+1] == "store", fn~" is not a /gnu/store path");
   immutable from = sub_paths[idx+2];
   immutable rest = sub_paths[idx+3..$].join("/");
@@ -143,10 +141,10 @@ unittest {
   string[string] store_entries = ["test":"test"];
   foreach(string p; guix_list) {
     auto t = reduce_store_path(p,"/home/user/opt/my_tests/");
-    writeln(t);
+    info(t);
     store_entries[t[0]] = t[1];
   }
-  writeln(store_entries);
+  debug_info(store_entries);
   relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
   auto pid = spawnShell("diff test/output/paths.txt.ref test/output/paths.txt");
   auto exitcode = wait(pid);
