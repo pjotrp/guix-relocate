@@ -1,0 +1,39 @@
+#! /home/user/opt/my_tests/bash-4.3.42-xqpfv050si2smd32lk2/bin/bash
+# 
+# Test file for guix-relocate
+#
+
+# Single links
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/bin/logname
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib
+# Base path
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/
+# Base path without slash
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
+# Paths on one line
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555 /home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/
+/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/$LIB:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/$LIB
+# Exceptions
+*gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/share/bashdb/bashdb-main.inc
+*gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/
+*gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42
+# Wrong paths
+*gnu/store/apx87qb8g3f6xd wrong /
+*gnu/store/apx87qb8g3f6xd/
+*gnu/store/apx87qb8g3f6xd
+*gnu/store/apx87qb8g3f6xd/:*gnu/store/apx87qb8g3f6xd/:
+# Store path
+*gnu/store/
+*gnu/store/ wrong too
+*gnu/store/ wrong too /
+/gnu/store
+/gnu/store wrong
+
+# So far, so good (we hope).
+
+
