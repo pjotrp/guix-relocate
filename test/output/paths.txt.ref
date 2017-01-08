@@ -4,20 +4,20 @@
 #
 
 # Single links
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/bin/logname
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/bin/logname
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib/
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib
 # Base path
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/
 # Base path without slash
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55
 # Paths on one line
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555 /home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/lib/
-/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/$LIB:/home/user/opt/my_tests/coreutils-8.2-apx87qb8g3f6x0gbx555/$LIB
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55 /home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55:/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/:/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib:/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib/:/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/lib/
+/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/$LIB:/home/user/opt/my_tests/coreutils-8.25-apx87qb8g3f6x0gbx55/$LIB
 # Exceptions
 *gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/share/bashdb/bashdb-main.inc
 *gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/

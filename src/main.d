@@ -47,13 +47,18 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
     }
     else {
       // In some cases the string is too long so we walk backwards for a match
-      string target;
-      string p;
-      foreach(int i, char c; path) {
-        p = path[0..$-i];
-        target = store_entries.get(p,null);
-        if (target) break;
+      auto find_path_target(string path) {
+        auto target = store_entries.get(path,null);
+        if (path == "" || path == "/gnu/store")
+          return tuple(cast(string)null,cast(string)null);
+        if (target)
+          return tuple(target,path);
+        else
+          return find_path_target(path[0..$-1]);
       }
+      auto path_target = find_path_target(path);
+      immutable target = path_target[0];
+      immutable p = path_target[1];
       if (!target) {
         warning("Can not find target for <"~path~">");
         buf[pos] = '*';
