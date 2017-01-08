@@ -13,17 +13,17 @@ void info(T...)(T args)
 
 void warning(T...)(T args)
 {
-  stderr.writeln(args);
+  stderr.writeln("WARNING ",args);
 }
 
 void error(T...)(T args)
 {
-  stderr.writeln(args);
+  stderr.writeln("ERROR ",args);
   throw new Exception(args);
 }
 
 void debug_info(T...)(T args)
 {
   if (is_debug)
-    stderr.writeln(args);
+    stderr.writeln("DEBUG ",args);
 }

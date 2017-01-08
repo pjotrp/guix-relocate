@@ -31,7 +31,7 @@ auto reduce_store_path(string fn, string prefix) {
     error("Paths not equally sized for "~target2); // not supposed to happen
   assert(indexOf(target2,"/gnu/store")==-1,"/gnu/store is not allowed in the target "~target2);
   info(from2," -> ",target2);
-  return tuple(target2,rest);
+  return tuple(from2,target2,rest);
 }
 
 void relocate_file(string fn,string outfn,in string[string] store_entries) {
@@ -53,10 +53,15 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
         target = store_entries.get(p,null);
         if (target) break;
       }
-      assert(target,"Can not find target for <"~path~">");
-      debug_info("Replace with\t\t",target);
-      foreach(int i, char c; target) {
-        buf[pos+i] = c;
+      if (!target) {
+        warning("Can not find target for <"~path~">");
+        buf[pos] = '*';
+      }
+      else {
+        debug_info("Replace with\t\t",target);
+        foreach(int i, char c; target) {
+          buf[pos+i] = c;
+        }
       }
     }
     pos = indexOf(buf,"/gnu/store/"); // may be replaced with Boyer Moore
@@ -100,7 +105,7 @@ tar ball containing ./gnu/store/path(s).
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
     immutable path_fn_tuple = reduce_store_path(args[1],prefix);
-    auto outfn = path_fn_tuple[0]~"/"~path_fn_tuple[1];
+    auto outfn = path_fn_tuple[1]~"/"~path_fn_tuple[2];
     debug_info("File = ",fn,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
@@ -109,7 +114,7 @@ tar ball containing ./gnu/store/path(s).
     // $prefix/entry-hash with the exact same size
     string[string] store_entries;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
-      auto target = reduce_store_path(d,prefix)[0];
+      auto target = reduce_store_path(d,prefix)[1];
       foreach (key, value ; store_entries) {
         if (target == value)
           error("Key conflict for "~target~". Try a shorter prefix.");
@@ -123,13 +128,15 @@ tar ball containing ./gnu/store/path(s).
 }
 
 unittest {
-  string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42",
+  messages.is_debug = true;
+  messages.is_verbose = true;
+  string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash",
                         "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.2"];
   string[string] store_entries = ["test":"test"];
   foreach(string p; guix_list) {
-    auto target = reduce_store_path(p,"/home/user/opt/my_tests/")[0];
-    writeln(target);
-    store_entries["/gnu/store/"~baseName(p)] = target;
+    auto t = reduce_store_path(p,"/home/user/opt/my_tests/");
+    writeln(t);
+    store_entries[t[0]] = t[1];
   }
   writeln(store_entries);
   relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
