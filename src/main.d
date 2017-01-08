@@ -48,8 +48,9 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
     else {
       // In some cases the string is too long so we walk backwards for a match
       string target;
+      string p;
       foreach(int i, char c; path) {
-        auto p = path[0..$-i];
+        p = path[0..$-i];
         target = store_entries.get(p,null);
         if (target) break;
       }
@@ -59,6 +60,7 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
       }
       else {
         debug_info("Replace with\t\t",target);
+        assert(p.length == target.length, "Size mismatch between <"~p~"> and <"~target~">");
         foreach(int i, char c; target) {
           buf[pos+i] = c;
         }
@@ -127,13 +129,12 @@ tar ball containing ./gnu/store/path(s).
   }
 }
 
-
 unittest {
   import std.process;
   messages.is_debug = true;
   messages.is_verbose = true;
   string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash",
-                        "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.2"];
+                        "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25"];
   string[string] store_entries = ["test":"test"];
   foreach(string p; guix_list) {
     auto t = reduce_store_path(p,"/home/user/opt/my_tests/");
