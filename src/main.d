@@ -34,6 +34,39 @@ auto reduce_store_path(string fn, string prefix) {
   return tuple(target2,rest);
 }
 
+void patch_file(string fn,string outfn,in string[string] store_entries) {
+  char[] buf = cast(char [])read(fn); // assume the file fits into RAM
+  immutable buf_sliced = cast(string)buf;
+  auto pos = indexOf(buf_sliced,"/gnu/store/");
+  while(pos != -1) {
+    immutable b = buf_sliced[pos..$];
+    immutable path = split(b,"/")[0..4].join("/");
+    debug_info("Found @",pos,":\t\t",path);
+    if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
+      buf[pos] = '*';
+    }
+    else {
+      // In some cases the string is too long so we walk for a match
+      string found;
+      foreach(int i, char c; path) {
+        auto p = path[0..$-i];
+        found = store_entries.get(p,null);
+        if (found) break;
+      }
+      immutable target = found;
+      assert(target,"Can not find target for <"~path~">");
+      debug_info("Replace with\t\t",target);
+      foreach(int i, char c; target) {
+        buf[pos+i] = c;
+      }
+    }
+    pos = indexOf(buf,"/gnu/store/"); // may be replaced with Boyer Moore
+  }
+  // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
+  debug_info("Writing "~outfn);
+  std.file.write(outfn,buf);
+}
+
 void main(string[] args) {
   string origin = "./gnu/store", prefix;
   auto help = getopt(
@@ -64,62 +97,33 @@ tar ball containing ./gnu/store/path(s).
     debug_info(args);
     if (args.length != 2) error("Wrong number of arguments");
     auto fn = origin ~ "/" ~ args[1];
-    char[] buf = cast(char [])read(fn); // assume the file fits into RAM
     if (prefix[$-1]!=dirSeparator[0]) // make sure prefix ends with a separator
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
-    immutable res = reduce_store_path(args[1],prefix);
-    auto outfn = res[0]~"/"~res[1];
-    debug_info("File = ",fn,", Size = ",buf.length,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
+    immutable path_fn_tuple = reduce_store_path(args[1],prefix);
+    auto outfn = path_fn_tuple[0]~"/"~path_fn_tuple[1];
+    debug_info("File = ",fn,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
     auto store = origin ~ "/gnu/store";
     assert(isDir(store));
     // ---- harvest Guix hashes and translate to new prefix path with
     // hash at end so /gnu/store/hash-entry points to
     // $prefix/entry-hash with the exact same size
-    string[string] store_entry;
+    string[string] store_entries;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
       auto target = reduce_store_path(d,prefix)[0];
-      foreach (key, value ; store_entry) {
+      foreach (key, value ; store_entries) {
         if (target == value)
           error("Key conflict for "~target~". Try a shorter prefix.");
       }
       // assert(exists(target),"Directory already exists "~target);
-      store_entry["/gnu/store/"~baseName(d)] = target;
+      store_entries["/gnu/store/"~baseName(d)] = target;
     }
-    debug_info(store_entry);
-    // At this point we have the entries and we have a file in memory
-    immutable buf_sliced = cast(string)buf;
-    auto pos = indexOf(buf_sliced,"/gnu/store/");
-    while(pos != -1) {
-      immutable b = buf_sliced[pos..$];
-      immutable path = split(b,"/")[0..4].join("/");
-      debug_info("Found @",pos,":\t\t",path);
-      if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
-        buf[pos] = '*';
-      }
-      else {
-        // In some cases the string is too long so we walk for a match
-        string found;
-        foreach(int i, char c; path) {
-          auto p = path[0..$-i];
-          found = store_entry.get(p,null);
-          if (found) break;
-        }
-        immutable target = found;
-        assert(target,"Can not find target for <"~path~">");
-        debug_info("Replace with\t\t",target);
-        foreach(int i, char c; target) {
-          buf[pos+i] = c;
-        }
-      }
-      pos = indexOf(buf,"/gnu/store/"); // may be replaced with Boyer Moore
-    }
-    // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
-    debug_info("Writing "~outfn);
-    std.file.write(outfn,buf);
+    debug_info(store_entries);
+    patch_file(fn,outfn,store_entries);
   }
 }
 
 unittest {
-  assert(1==2);
+  string[string] store_entries;
+  patch_file("test/data/paths.txt","test/output/paths.txt",store_entries);
 }
