@@ -1,4 +1,6 @@
-// Guix binary relocate
+// Guix relocate scans a file for Guix finger prints and replaces them
+// with a new installation prefix, cutting the path to the exact same
+// size.
 //
 // Pjotr Prins (c) 2017
 
@@ -116,4 +118,8 @@ tar ball containing ./gnu/store/path(s).
     debug_info("Writing "~outfn);
     std.file.write(outfn,buf);
   }
+}
+
+unittest {
+  assert(1==2);
 }

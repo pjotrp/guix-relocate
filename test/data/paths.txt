@@ -1,0 +1,35 @@
+#! /gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash
+# 
+# Test file for guix-relocate
+#
+
+# Single links
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/bin/logname
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib/
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib
+# Base path
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/
+# Base path without slash
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25
+# Paths on one line
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25 /gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib/:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib/
+/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/$LIB:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/$LIB
+# Wrong paths
+/gnu/store/apx87qb8g3f6xd wrong /
+/gnu/store/apx87qb8g3f6xd/
+/gnu/store/apx87qb8g3f6xd
+/gnu/store/apx87qb8g3f6xd/:/gnu/store/apx87qb8g3f6xd/:
+# Store path
+/gnu/store/
+/gnu/store/ wrong too
+/gnu/store/ wrong too /
+/gnu/store
+/gnu/store wrong
+
+# So far, so good (we hope).
+
+
