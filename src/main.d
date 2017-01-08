@@ -127,7 +127,9 @@ tar ball containing ./gnu/store/path(s).
   }
 }
 
+
 unittest {
+  import std.process;
   messages.is_debug = true;
   messages.is_verbose = true;
   string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash",
@@ -140,4 +142,7 @@ unittest {
   }
   writeln(store_entries);
   relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
+  auto pid = spawnShell("diff test/output/paths.txt.ref test/output/paths.txt");
+  auto exitcode = wait(pid);
+  if (exitcode != 0) exit(exitcode);
 }
