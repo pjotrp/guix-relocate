@@ -34,7 +34,7 @@ auto reduce_store_path(string fn, string prefix) {
   return tuple(target2,rest);
 }
 
-void patch_file(string fn,string outfn,in string[string] store_entries) {
+void relocate_file(string fn,string outfn,in string[string] store_entries) {
   char[] buf = cast(char [])read(fn); // assume the file fits into RAM
   immutable buf_sliced = cast(string)buf;
   auto pos = indexOf(buf_sliced,"/gnu/store/");
@@ -46,14 +46,13 @@ void patch_file(string fn,string outfn,in string[string] store_entries) {
       buf[pos] = '*';
     }
     else {
-      // In some cases the string is too long so we walk for a match
-      string found;
+      // In some cases the string is too long so we walk backwards for a match
+      string target;
       foreach(int i, char c; path) {
         auto p = path[0..$-i];
-        found = store_entries.get(p,null);
-        if (found) break;
+        target = store_entries.get(p,null);
+        if (target) break;
       }
-      immutable target = found;
       assert(target,"Can not find target for <"~path~">");
       debug_info("Replace with\t\t",target);
       foreach(int i, char c; target) {
@@ -119,11 +118,19 @@ tar ball containing ./gnu/store/path(s).
       store_entries["/gnu/store/"~baseName(d)] = target;
     }
     debug_info(store_entries);
-    patch_file(fn,outfn,store_entries);
+    relocate_file(fn,outfn,store_entries);
   }
 }
 
 unittest {
-  string[string] store_entries;
-  patch_file("test/data/paths.txt","test/output/paths.txt",store_entries);
+  string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42",
+                        "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.2"];
+  string[string] store_entries = ["test":"test"];
+  foreach(string p; guix_list) {
+    auto target = reduce_store_path(p,"/home/user/opt/my_tests/")[0];
+    writeln(target);
+    store_entries["/gnu/store/"~baseName(p)] = target;
+  }
+  writeln(store_entries);
+  relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
 }
