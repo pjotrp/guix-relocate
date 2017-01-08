@@ -34,11 +34,10 @@ auto reduce_store_path(string fn, string prefix) {
 
 void relocate_file(string fn,string outfn,in string[string] store_entries) {
   char[] buf = cast(char [])read(fn); // assume the file fits into RAM
-  immutable buf_sliced = cast(string)buf;
-  auto pos = indexOf(buf_sliced,"/gnu/store/");
+  auto pos = indexOf(buf,"/gnu/store/");
   while(pos != -1) {
-    immutable b = buf_sliced[pos..$];
-    immutable path = split(b,"/")[0..4].join("/");
+    auto b = cast(string)buf[pos..$];
+    string path = split(b,"/")[0..4].join("/");
     debug_info("Found @",pos,":\t\t",path);
     if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
       buf[pos] = '*';
@@ -65,7 +64,7 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
         debug_info("Replace with\t\t",target);
         assert(p.length == target.length, "Size mismatch between <"~p~"> and <"~target~">");
         foreach(int i, char c; target) {
-          buf[pos+i] = c;
+          buf[pos+i] = c; // overwrite
         }
       }
     }
