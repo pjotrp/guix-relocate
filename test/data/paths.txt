@@ -18,6 +18,10 @@
 /gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib
 /gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib/:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/lib/
 /gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/$LIB:/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25/$LIB
+# Exceptions
+/gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/share/bashdb/bashdb-main.inc
+/gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42/
+/gnu/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-static-4.3.42
 # Wrong paths
 /gnu/store/apx87qb8g3f6xd wrong /
 /gnu/store/apx87qb8g3f6xd/
