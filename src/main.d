@@ -45,8 +45,8 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
     }
     else {
       // In some cases the string is too long so we walk backwards for a match
-      auto find_path_target(string path) {
-        auto target = store_entries.get(path,null);
+      Tuple!(string,string) find_path_target(string path) {
+        immutable target = store_entries.get(path,null);
         if (path == "" || path == "/gnu/store")
           return tuple(cast(string)null,cast(string)null);
         if (target)
@@ -54,7 +54,7 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
         else
           return find_path_target(path[0..$-1]);
       }
-      auto path_target = find_path_target(path);
+      immutable path_target = find_path_target(path);
       immutable target = path_target[0];
       immutable p = path_target[1];
       if (!target) {
@@ -105,21 +105,21 @@ tar ball containing ./gnu/store/path(s).
     info("guix-relocate by Pjotr Prins (C) 2017 pjotr.prins@thebird.nl");
     debug_info(args);
     if (args.length != 2) error("Wrong number of arguments");
-    auto fn = origin ~ "/" ~ args[1];
+    immutable fn = origin ~ "/" ~ args[1];
     if (prefix[$-1]!=dirSeparator[0]) // make sure prefix ends with a separator
       prefix = prefix ~ dirSeparator;
     assert(isDir(prefix));
     immutable path_fn_tuple = reduce_store_path(args[1],prefix);
-    auto outfn = path_fn_tuple[1]~"/"~path_fn_tuple[2];
+    immutable outfn = path_fn_tuple[1]~"/"~path_fn_tuple[2];
     debug_info("File = ",fn,", Origin = ",origin,", Prefix = ",prefix,", Output = ",outfn);
-    auto store = origin ~ "/gnu/store";
+    immutable store = origin ~ "/gnu/store";
     assert(isDir(store));
     // ---- harvest Guix hashes and translate to new prefix path with
     // hash at end so /gnu/store/hash-entry points to
     // $prefix/entry-hash with the exact same size
     string[string] store_entries;
     foreach(d; dirEntries(store,SpanMode.shallow)) {
-      auto target = reduce_store_path(d,prefix)[1];
+      immutable target = reduce_store_path(d,prefix)[1];
       foreach (key, value ; store_entries) {
         if (target == value)
           error("Key conflict for "~target~". Try a shorter prefix.");
@@ -140,13 +140,13 @@ unittest {
                         "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25"];
   string[string] store_entries = ["test":"test"];
   foreach(string p; guix_list) {
-    auto t = reduce_store_path(p,"/home/user/opt/my_tests/");
+    immutable t = reduce_store_path(p,"/home/user/opt/my_tests/");
     info(t);
     store_entries[t[0]] = t[1];
   }
   debug_info(store_entries);
   relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
   auto pid = spawnShell("diff test/output/paths.txt.ref test/output/paths.txt");
-  auto exitcode = wait(pid);
+  immutable exitcode = wait(pid);
   if (exitcode != 0) exit(exitcode);
 }
