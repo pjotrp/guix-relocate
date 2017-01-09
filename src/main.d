@@ -36,11 +36,11 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
   char[] buf = cast(char [])read(fn); // assume the file fits into RAM
 
   void patch(char[] b) {
-    immutable b_short = take(b[0..$],128).to!string; // assume base store path is shorter
-    string path = split(b_short,"/")[0..4].join("/");
+    immutable b_short = take(b[0..$],128).to!string;  // assume base store path is shorter
+    string path = split(b_short,"/")[0..4].join("/"); // rejoin first 3 sections of store path
     debug_info("Found @",b.ptr-buf.ptr,":\t\t",path);
     if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
-      b[0] = '*';
+      b[0] = '*'; // disabling any store reference
     }
     else {
       // In some cases the string is too long so we walk backwards for a match
@@ -58,7 +58,7 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
       immutable p = path_target[1];
       if (!target) {
         warning("Can not find target for <"~path~">");
-        b[0] = '*';
+        b[0] = '*'; // disable any store reference
       }
       else {
         debug_info("Replace with\t\t",target);
@@ -147,7 +147,7 @@ unittest {
   messages.is_verbose = true;
   string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash",
                         "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25"];
-  string[string] store_entries = ["test":"test"];
+  string[string] store_entries;
   foreach(string p; guix_list) {
     immutable t = reduce_store_path(p,"/home/user/opt/my_tests/");
     info(t);
@@ -157,5 +157,5 @@ unittest {
   relocate_file("test/data/paths.txt","test/output/paths.txt",store_entries);
   auto pid = spawnShell("diff test/output/paths.txt.ref test/output/paths.txt");
   immutable exitcode = wait(pid);
-  if (exitcode != 0) exit(exitcode);
+  if (exitcode != 0) exit(exitcode); // make sure to exit test with exit code
 }
