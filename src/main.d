@@ -34,14 +34,13 @@ auto reduce_store_path(string fn, string prefix) {
 
 void relocate_file(string fn,string outfn,in string[string] store_entries) {
   char[] buf = cast(char [])read(fn); // assume the file fits into RAM
-  auto pos = indexOf(buf,"/gnu/store/");
-  while(pos != -1) {
-    // auto b = cast(string)buf[pos..$];
-    immutable b = take(buf[pos..$],128).to!string; // assume base store path is short
-    string path = split(b,"/")[0..4].join("/");
-    debug_info("Found @",pos,":\t\t",path);
+
+  void patch(char[] b) {
+    immutable b_short = take(b[0..$],128).to!string; // assume base store path is shorter
+    string path = split(b_short,"/")[0..4].join("/");
+    debug_info("Found @",b.ptr-buf.ptr,":\t\t",path);
     if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
-      buf[pos] = '*';
+      b[0] = '*';
     }
     else {
       // In some cases the string is too long so we walk backwards for a match
@@ -59,18 +58,28 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
       immutable p = path_target[1];
       if (!target) {
         warning("Can not find target for <"~path~">");
-        buf[pos] = '*';
+        b[0] = '*';
       }
       else {
         debug_info("Replace with\t\t",target);
         assert(p.length == target.length, "Size mismatch between <"~p~"> and <"~target~">");
         foreach(int i, char c; target) {
-          buf[pos+i] = c; // overwrite
+          b[i] = c; // overwrite
         }
       }
     }
-    pos = indexOf(buf,"/gnu/store/"); // may be replaced with Boyer Moore
   }
+
+  void finder(char[] b) {
+    auto found = find(b, cast(char[])"/gnu/store/");
+    if (found.empty)
+      return;
+    else {
+      patch(found);
+      return finder(found[10..$]);
+    }
+  }
+  finder(buf);
   // mkdirRecurse(dirName(outfn)); <- for now we assume it exists
   debug_info("Writing "~outfn);
   std.file.write(outfn,buf);
