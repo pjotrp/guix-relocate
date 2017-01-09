@@ -36,7 +36,8 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
   char[] buf = cast(char [])read(fn); // assume the file fits into RAM
   auto pos = indexOf(buf,"/gnu/store/");
   while(pos != -1) {
-    auto b = cast(string)buf[pos..$];
+    // auto b = cast(string)buf[pos..$];
+    immutable b = take(buf[pos..$],128).to!string; // assume base store path is short
     string path = split(b,"/")[0..4].join("/");
     debug_info("Found @",pos,":\t\t",path);
     if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
