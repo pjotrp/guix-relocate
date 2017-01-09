@@ -11,14 +11,13 @@ import messages;
 
 auto reduce_store_path(string fn, string prefix) {
   debug_info("Reduce store path "~fn);
-  immutable sub_paths = fn.split("/");
-  auto sub_paths_rev = sub_paths.dup.reverse;
-  immutable idxrev = countUntil(sub_paths_rev,"gnu");
-  assert(idxrev != -1, "This should not happen");
-  immutable idx = sub_paths.length - idxrev - 1;
-  assert(sub_paths[idx+1] == "store", fn~" is not a /gnu/store path");
-  immutable from = sub_paths[idx+2];
-  immutable rest = sub_paths[idx+3..$].join("/");
+  auto startidx = indexOf(fn,"/gnu/store/");
+  assert(startidx != -1, fn~" is not a /gnu/store path");
+  immutable sub_paths = fn[startidx..$].split("/");
+  debug_info(sub_paths);
+  assert(sub_paths[2] == "store", fn~" is not a /gnu/store path");
+  immutable from = sub_paths[3];
+  immutable rest = sub_paths[4..$].join("/");
   debug_info("Rest is "~rest);
   immutable split_path = split(from,"-");
   assert(split_path.length >= 2,"Guix path "~from~" does not look complete");
