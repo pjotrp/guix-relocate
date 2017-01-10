@@ -14,11 +14,11 @@ auto reduce_store_path(string fn, string prefix) {
   auto startidx = indexOf(fn,"/gnu/store/");
   assert(startidx != -1, fn~" is not a /gnu/store path");
   immutable sub_paths = fn[startidx..$].split("/");
-  debug_info(sub_paths);
+  // debug_info(sub_paths);
   assert(sub_paths[2] == "store", fn~" is not a /gnu/store path");
   immutable from = sub_paths[3];
   immutable rest = sub_paths[4..$].join("/");
-  debug_info("Rest is "~rest);
+  debug_info("Rest is <"~rest~">");
   immutable split_path = split(from,"-");
   assert(split_path.length >= 2,"Guix path "~from~" does not look complete");
   immutable target = prefix ~ split_path[1..$].join("-") ~ "-" ~ split_path[0] ~ "padpadpadpadpadpadpadpadpadpadpadpadpad";
@@ -135,7 +135,7 @@ tar ball containing ./gnu/store/path(s).
       // assert(exists(target),"Directory already exists "~target);
       store_entries["/gnu/store/"~baseName(d)] = target;
     }
-    debug_info(store_entries);
+    // debug_info(store_entries);
     relocate_file(fn,outfn,store_entries);
   }
 }
