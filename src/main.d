@@ -32,11 +32,11 @@ auto reduce_store_path(string fn, string prefix) {
 }
 
 void relocate_file(string fn,string outfn,in string[string] store_entries) {
-  char[] buf = cast(char [])read(fn); // assume the file fits into RAM
+  ubyte[] buf = cast(ubyte[])read(fn); // assume the file fits into RAM
 
-  void patch(char[] b) {
-    immutable b_short = take(b[0..$],128).to!string;  // assume base store path is shorter
-    string path = split(b_short,"/")[0..4].join("/"); // rejoin first 3 sections of store path
+  void patch(ubyte[] b) {
+    auto b_short = cast(string)take(b[0..$],128);  // assume base store path is shorter
+    auto path = split(b_short,"/")[0..4].join("/"); // rejoin first 3 sections of store path
     debug_info("Found @",b.ptr-buf.ptr,":\t\t",path);
     if (indexOf(path,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-") != -1) {
       b[0] = '*'; // disabling any store reference
@@ -69,8 +69,8 @@ void relocate_file(string fn,string outfn,in string[string] store_entries) {
     }
   }
 
-  void finder(char[] b) {
-    auto found = find(b, cast(char[])"/gnu/store/");
+  void finder(ubyte[] b) {
+    auto found = find(b, cast(ubyte[])"/gnu/store/");
     if (found.empty)
       return;
     else {
