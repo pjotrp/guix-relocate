@@ -90,6 +90,7 @@ void main(string[] args) {
     args,
     "origin", "origin location where ./gnu/store finger prints are harvested (default .)", &origin,
     "prefix", "prefix for destination", &prefix,
+    "i", "ignore warnings (default throws error)", &messages.error_on_warning,
     "d", "debug information", &messages.is_debug,
     "v", "verbose", &messages.is_verbose,
     );
@@ -144,6 +145,7 @@ unittest {
   import std.process;
   messages.is_debug = true;
   messages.is_verbose = true;
+  messages.error_on_warning = false;
   string[] guix_list = ["/gnu/store/xqpfv050si2smd32lk2mvnjhmgb4crs6-bash-4.3.42/bin/bash",
                         "/gnu/store/apx87qb8g3f6x0gbx555qpnfm1wkdv4v-coreutils-8.25"];
   string[string] store_entries;

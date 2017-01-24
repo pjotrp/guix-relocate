@@ -3,7 +3,7 @@ module messages;
 import std.stdio;
 import core.vararg;
 
-bool is_debug = false, is_verbose = false;
+bool is_debug = false, is_verbose = false, error_on_warning = true;
 
 void info(T...)(T args)
 {
@@ -13,6 +13,8 @@ void info(T...)(T args)
 
 void warning(T...)(T args)
 {
+  if (error_on_warning)
+    error("WARNING ",args);
   stderr.writeln("WARNING ",args);
 }
 
